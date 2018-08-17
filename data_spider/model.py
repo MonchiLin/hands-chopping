@@ -1,8 +1,5 @@
 import datetime
 
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-
 from config import Config
 
 db = Config.db
@@ -10,7 +7,7 @@ db = Config.db
 
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    game_number = db.Column(db.String)
+    game_number = db.Column(db.String, unique=True)
     game_name = db.Column(db.String)
     gama_price = db.relationship('Price', backref='game', lazy='dynamic')
     gama_link = db.Column(db.String)

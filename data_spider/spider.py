@@ -5,12 +5,10 @@ import grequests
 from bs4 import BeautifulSoup
 from sqlalchemy import create_engine
 
-
-from data_spider.model import Game,Price
 from config import Config
+from data_spider.model import Game, Price
 
 session = grequests.Session()
-
 
 
 def get_connection(config):
@@ -21,6 +19,7 @@ def get_connection(config):
 
 def get_data(link, config):
     price_number = None
+    db = config.db
 
     result = session.get(config.baseUrl + link["link"], headers=config.headers)
     soup = BeautifulSoup(result.text, "html5lib")
@@ -40,11 +39,19 @@ def get_data(link, config):
         number = re.split("/", info.attrs["href"])[-1]
         config.games.append({'id': number, 'name': name, "price": price_number})
 
-        game_temp = Game(name, number, link['link'])
-        price_temp = Price(price_number)
-        game_temp.gama_price.append(price_temp)
-        config.db.session.add(game_temp)
-        config.db.session.commit()
+        existed = Game.query.filter_by(game_number=number).first()
+
+        if existed is None:
+            game_temp = Game(name, number, link['link'])
+            price_temp = Price(price_number)
+            game_temp.gama_price.append(price_temp)
+            db.session.add(game_temp)
+            db.session.commit()
+        else:
+            price_temp = Price(price_number)
+            price_temp.game_id = existed.id
+            db.session.add(price_temp)
+            db.session.commit()
 
 
 def rua():
@@ -58,7 +65,6 @@ def rua():
         threads.append(pool.spawn(get_data, link, config))
 
     gevent.joinall(threads)
-
 
 
 if __name__ == '__main__':
