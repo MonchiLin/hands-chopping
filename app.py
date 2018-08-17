@@ -1,5 +1,5 @@
+import api.view  as view
 from config import Config
-
 
 # class GameResource(Resource):
 #     def get(self):
@@ -9,6 +9,8 @@ from config import Config
 # api.add_resource(GameResource, '/')
 
 
+api = Config.api
+api.add_resource(view.Game, '/')
 
 
 if __name__ == '__main__':

@@ -2,6 +2,7 @@ import re
 
 import gevent
 import grequests
+from apscheduler.schedulers.blocking import BlockingScheduler
 from bs4 import BeautifulSoup
 from sqlalchemy import create_engine
 
@@ -65,11 +66,9 @@ def rua():
         threads.append(pool.spawn(get_data, link, config))
 
     gevent.joinall(threads)
+    print("rua!")
 
 
-if __name__ == '__main__':
-    rua()
-
-# scheduler = BlockingScheduler()
-# scheduler.add_job(rua, 'interval', seconds=3)
-# scheduler.start()
+sched = BlockingScheduler()
+sched.add_job(rua, 'interval', minutes=5)
+sched.start()
