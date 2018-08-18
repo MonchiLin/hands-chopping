@@ -56,7 +56,7 @@ def fetch(db, soup, config, link):
         existed = Game.query.filter_by(game_number=number).first()
 
         if existed is None:
-            game_temp = Game(name, number, link['link'])
+            game_temp = Game(name, number, info['href'])
             price_temp = Price(price_number)
             game_temp.gama_price.append(price_temp)
             db.session.add(game_temp)
