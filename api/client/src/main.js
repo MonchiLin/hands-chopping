@@ -23,6 +23,7 @@ import {
     transitions,
     VProgressCircular,
     VPagination,
+    VAutocomplete,
 } from 'vuetify'
 
 Vue.use(Vuetify, {
@@ -40,6 +41,7 @@ Vue.use(Vuetify, {
         transitions,
         VProgressCircular,
         VPagination,
+        VAutocomplete,
     },
     theme: {
         primary: '#ee44aa',
@@ -52,10 +54,10 @@ Vue.use(Vuetify, {
     }
 })
 
-
 Vue.use(VueRouter)
 
 Vue.config.productionTip = false
+window.baseUrl = 'http://127.0.0.1:5000/'
 
 const routers = [
     {path: '/', name: 'games', component: GameList},

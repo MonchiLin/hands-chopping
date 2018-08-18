@@ -1,6 +1,13 @@
 <template>
     <v-container>
-        <v-data-table :headers="gamesHeader"
+        <v-autocomplete
+                :search-input.sync="inputGameName"
+                :items="gameNames"
+                v-model="selectGameName"
+                label="What state are you from?">
+        </v-autocomplete>
+
+        <v-data-table :headers="tableHeader"
                       hide-actions :items="games" item-key="id">
             <template slot="items" slot-scope="props">
                 <td>{{ props.item.game_name }}</td>
@@ -15,7 +22,7 @@
             </template>
         </v-data-table>
         <div class="text-xs-center">
-            <v-pagination @input="change_page"
+            <v-pagination @input="changePage"
                           v-model="pagination.page"
                           :total-visible="8"
                           :length="pagination.pasge"></v-pagination>
@@ -24,18 +31,18 @@
 </template>
 
 <script>
-    import {getGames} from "../helper/getData";
+
+    import {debounceTime, map, switchMap} from 'rxjs/operators'
+    import {from} from 'rxjs'
+    import axios from "axios";
 
     export default {
         name: "GameList",
         data() {
             return {
-                temp: {},
                 loading: false,
-                playstation: 'https://store.playstation.com',
                 games: [],
-                debuggerText: '',
-                gamesHeader: [
+                tableHeader: [
                     {text: '游戏名称', value: 'game_name'},
                     {text: '游戏编号', value: 'game_number'},
                     {text: '当前价格', value: 'game_price'},
@@ -49,34 +56,55 @@
                     totalItems: 10,
                     descending: false
                 },
-
+                inputGameName: null,
+                selectGameName: null,
+                gameNames: []
             }
         },
         mounted() {
             this.getData()
         },
-        methods: {
-            getData() {
-                getGames(this.pagination.page, this.pagination.rowsPerPage).then(({data}) => {
-                    this.pagination = {
-                        rowsPerPage: data.per_page,
-                        page: data.page,
-                        pasge: data.pasge,
-                        totalItems: data.total
-                    }
-                    this.games = data.items
-                })
-            },
-            openStore(row) {
-                this.debuggerText = row
-                window.open(this.playstation + row.game_link)
-            },
-            change_page(page) {
-                this.pagination.page = page
-                this.getData()
+        watch: {
+            inputGameName(val) {
+                const url = new URL(baseUrl + 'filter')
+                const params = {keyword: keyword}
+                url.search = new URLSearchParams(params)
+
+                return from(fetch('lkr'))
+                    .pipe(debounceTime(100))
+                    .subscribe(console.log)
             }
         },
+        methods: {
+            getData() {
 
+                const url = new URL(baseUrl + 'games')
+                const params = {
+                    page: this.pagination.page,
+                    per_page: this.pagination.rowsPerPage
+                }
+                url.search = new URLSearchParams(params)
+                from(fetch(url))
+                    .pipe(switchMap(res => from(res.json())))
+                    .subscribe((res) => {
+                        this.pagination = {
+                            rowsPerPage: res.per_page,
+                            page: res.page,
+                            pasge: res.pasge,
+                            totalItems: res.total
+                        }
+                        this.games = res.items
+                    })
+            },
+            openStore(row) {
+                const playstation = 'https://store.playstation.com'
+                window.open(playstation + row.game_link)
+            },
+            changePage(page) {
+                this.pagination.page = page
+                this.getData()
+            },
+        },
     }
 </script>
 

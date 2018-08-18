@@ -61,6 +61,24 @@ class PriceList(Resource):
         return jsonify(data)
 
 
+class Filter(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('keyword', type=str, default=None)
+        args = parser.parse_args()
+        keyword = args.keyword
+        if keyword is None:
+            return []
+
+        result = db.session.query(model.Game).filter(model.Game.game_name.like(keyword)).filter(
+            model.Game.game_jianpin.like(keyword)).filter(
+            model.Game.game_quanpin.like(keyword)).all()
+
+        print(result)
+
+        return []
+
+
 def convert_to_dict(results):
     temp = []
     for (key, value) in enumerate(results):
