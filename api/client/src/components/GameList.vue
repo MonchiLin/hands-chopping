@@ -2,8 +2,8 @@
     <v-container>
         <v-autocomplete
                 :search-input.sync="inputGameName"
-                v-model="selectGameName"
-                label="What state are you from?">
+                v-model="selectGameName" clearable
+                label="使用游戏名/简拼/全拼搜索">
         </v-autocomplete>
 
         <v-data-table :headers="tableHeader"
@@ -31,9 +31,10 @@
 
 <script>
 
-    import {debounceTime, map, switchMap, distinctUntilChanged} from 'rxjs/operators'
+    import {debounceTime, map, switchMap, distinctUntilChanged, filter} from 'rxjs/operators'
     import {from} from 'rxjs'
-    import axios from "axios";
+    import {FetchDataStore} from "../helper/helper";
+
 
     export default {
         name: "GameList",
@@ -64,18 +65,19 @@
         },
         watch: {
             inputGameName(keyword) {
+                keyword = keyword.replace(/[\ |\~|\`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\-|\_|\+|\=|\||\\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?]/g, "");
                 const url = new URL(baseUrl + 'filter')
                 const params = {keyword: keyword}
                 url.search = new URLSearchParams(params)
-
-                from(fetch(url))
-                    .pipe(
-                        debounceTime(5000),
-                        distinctUntilChanged(),
-                        switchMap(res => from(res.json()))
-                    ).subscribe(res => {
-                    this.games = res
-                })
+                new FetchDataStore(() => fetch(url))
+                    .data$
+                    .subscribe(res => {
+                        if (typeof(res.items) === 'undefined') {
+                            this.games = res
+                        } else {
+                            this.games = res.items
+                        }
+                    })
             }
         },
         methods: {

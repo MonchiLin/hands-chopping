@@ -10,13 +10,13 @@ db = config.Config.db
 
 
 class GameList(Resource):
-    def get(self):
+    def get(self, page=None, per_page=None):
         parser = reqparse.RequestParser()
         parser.add_argument('page', type=int, default=1)
         parser.add_argument('per_page', type=int, default=50)
         args = parser.parse_args()
-        page = args.page
-        per_page = args.per_page
+        page = page or args.page
+        per_page = per_page or args.per_page
 
         games = model.Game.query.with_entities(model.Game.id, model.Game.game_name, model.Game.game_number,
                                                model.Game.game_link).paginate(page, per_page, error_out=False)
@@ -69,8 +69,8 @@ class Filter(Resource):
         parser.add_argument('keyword', type=str, default=None)
         args = parser.parse_args()
         keyword = args.keyword
-        if keyword is None:
-            return []
+        if keyword is None or keyword.strip() == '':
+            return GameList().get(1, 50)
 
         # keyword = r'%' + keyword + '%'
 

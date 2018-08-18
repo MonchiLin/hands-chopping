@@ -22,5 +22,7 @@
 </script>
 
 <style>
-
+    div.v-menu__content {
+        display: none;
+    }
 </style>
