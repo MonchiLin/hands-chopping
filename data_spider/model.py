@@ -17,6 +17,12 @@ class Game(db.Model):
         self.game_number = number
         self.gama_link = link
 
+    @property
+    def serialize(self):
+        return {'game_number': self.game_number,
+                'game_name': self.game_name,
+                'gama_link': self.gama_link}
+
 
 class Price(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -26,6 +32,13 @@ class Price(db.Model):
 
     def __init__(self, price):
         self.gama_price = price
+
+    @property
+    def serialize(self):
+        return {'id': self.id,
+                'game_id': self.game_id,
+                'gama_price': self.gama_price,
+                'time': str(self.time)}
 
 # def create_date():
 #     game1 = Game("123", "2312", "123")

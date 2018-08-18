@@ -1,3 +1,4 @@
+import os
 import re
 
 import gevent
@@ -19,13 +20,27 @@ def get_connection(config):
 
 
 def get_data(link, config):
-    price_number = None
     db = config.db
 
     result = session.get(config.baseUrl + link["link"], headers=config.headers)
     soup = BeautifulSoup(result.text, "html5lib")
-    body = soup.select("div.grid-cell__body")
 
+    end_btn = soup.select("a.paginator-control__end")
+
+    if len(end_btn) == 0:
+        fetch(db, soup, config, link)
+    else:
+        end = re.split("/", end_btn[0].attrs["href"])[-1]
+        for i in range(int(end)):
+            url = config.baseUrl + link["link"] + '/' + str(i)
+            res = session.get(url, headers=config.headers)
+            content = BeautifulSoup(res.text, "html5lib")
+            fetch(db, content, config, link)
+
+
+def fetch(db, soup, config, link):
+    price_number = None
+    body = soup.select("div.grid-cell__body")
     for content in body:
         info = content.find("a")
         price = content.select_one("h3.price-display__price")
@@ -36,10 +51,8 @@ def get_data(link, config):
             prue_price = re.findall(r"\d+\.?\d*", price.text)
             price_number = float(''.join(prue_price))
 
-        name = info.find("div").text
+        name = info.find("div").text.strip()
         number = re.split("/", info.attrs["href"])[-1]
-        config.games.append({'id': number, 'name': name, "price": price_number})
-
         existed = Game.query.filter_by(game_number=number).first()
 
         if existed is None:
@@ -64,11 +77,14 @@ def rua():
     threads = []
     for link in config.links:
         threads.append(pool.spawn(get_data, link, config))
+        # get_data(link, config)
 
     gevent.joinall(threads)
     print("rua!")
 
 
-sched = BlockingScheduler()
-sched.add_job(rua, 'interval', minutes=5)
-sched.start()
+rua()
+
+# sched = BlockingScheduler()
+# sched.add_job(rua, 'interval', minutes=5)
+# sched.start()

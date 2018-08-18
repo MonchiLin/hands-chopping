@@ -1,3 +1,4 @@
+import os
 from enum import Enum, unique
 
 from flask import Flask
@@ -14,7 +15,8 @@ class App(object):
         if not hasattr(App, "_app"):
             App._app = Flask(__name__)
             # App._app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///app.db'
-            App._app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:////home/muxi/Coding/hands-chopping/data.db'
+            App._app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///{}/data.db'.format(
+                os.path.dirname(os.path.realpath(__file__)))
             App._app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
         return App._app
 
@@ -34,7 +36,8 @@ class App(object):
 class Config:
     host = 'localhost'
     port = 6379
-    sqlite = 'sqlite:////home/muxi/Coding/hands-chopping/data.db'
+    sqlite = 'sqlite:///{}/data.db'.format(os.path.dirname(os.path.realpath(__file__)))
+    path = os.path.dirname(os.path.realpath(__file__))
     baseUrl = "https://store.playstation.com/"
     region = 'zh-hans-cn'
     app = App.get_app()
