@@ -2,7 +2,6 @@
     <v-container>
         <v-autocomplete
                 :search-input.sync="inputGameName"
-                :items="gameNames"
                 v-model="selectGameName"
                 label="What state are you from?">
         </v-autocomplete>
@@ -17,7 +16,7 @@
                     <v-icon @click="openStore(props.item)" small>call_made</v-icon>
                 </td>
                 <td>
-                    <router-link :to="{name:'product',params:{number:props.item.game_number}}">查看打折信息</router-link>
+                    <router-link :to="{name:'product',params:{number:props.item.game_number}}">历史价格</router-link>
                 </td>
             </template>
         </v-data-table>
@@ -32,7 +31,7 @@
 
 <script>
 
-    import {debounceTime, map, switchMap} from 'rxjs/operators'
+    import {debounceTime, map, switchMap, distinctUntilChanged} from 'rxjs/operators'
     import {from} from 'rxjs'
     import axios from "axios";
 
@@ -57,22 +56,26 @@
                     descending: false
                 },
                 inputGameName: null,
-                selectGameName: null,
-                gameNames: []
+                selectGameName: null
             }
         },
         mounted() {
             this.getData()
         },
         watch: {
-            inputGameName(val) {
+            inputGameName(keyword) {
                 const url = new URL(baseUrl + 'filter')
                 const params = {keyword: keyword}
                 url.search = new URLSearchParams(params)
 
-                return from(fetch('lkr'))
-                    .pipe(debounceTime(100))
-                    .subscribe(console.log)
+                from(fetch(url))
+                    .pipe(
+                        debounceTime(5000),
+                        distinctUntilChanged(),
+                        switchMap(res => from(res.json()))
+                    ).subscribe(res => {
+                    this.games = res
+                })
             }
         },
         methods: {

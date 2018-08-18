@@ -1,3 +1,5 @@
+import json
+
 from flask import jsonify
 from flask_restful import Resource, reqparse
 
@@ -70,13 +72,18 @@ class Filter(Resource):
         if keyword is None:
             return []
 
-        result = db.session.query(model.Game).filter(model.Game.game_name.like(keyword)).filter(
-            model.Game.game_jianpin.like(keyword)).filter(
-            model.Game.game_quanpin.like(keyword)).all()
+        # keyword = r'%' + keyword + '%'
 
-        print(result)
+        raw_sql = r"SELECT * FROM game WHERE game_name LIKE '%{0}%' OR game_quanpin LIKE '%{0}%' OR game_jianpin LIKE '%{0}%'".format(
+            keyword)
 
-        return []
+        # result = db.session.query(model.Game).filter(model.Game.game_name.like(keyword)).filter(
+        #     model.Game.game_jianpin.like(keyword)).filter(
+        #     model.Game.game_quanpin.like(keyword)).all()
+
+        results = db.session.execute(raw_sql).fetchall()
+
+        return jsonify(raw_query_to_json(results))
 
 
 def convert_to_dict(results):
@@ -87,3 +94,14 @@ def convert_to_dict(results):
             obj[v] = value[k]
         temp.append(obj)
     return temp
+
+
+def raw_query_to_json(results):
+    d, a = {}, []
+    for rowproxy in results:
+        # rowproxy.items() returns an array like [(key0, value0), (key1, value1)]
+        for tup in rowproxy.items():
+            # build up the dictionary
+            d = {**d, **{tup[0]: tup[1]}}
+        a.append(d)
+    return a

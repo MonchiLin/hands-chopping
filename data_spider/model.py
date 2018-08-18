@@ -26,7 +26,7 @@ class Game(db.Model):
                 'game_link': self.game_link}
 
     def __repr__(self):
-        return "Game Number:" + str(self.game_number)
+        return "Game Number:" + self.game_number
 
 
 class Price(db.Model):
@@ -38,17 +38,22 @@ class Price(db.Model):
     def __init__(self, price):
         self.game_price = price
 
+    @property
+    def serialize(self):
+        return {'id': self.id,
+                'game_id': self.game_id,
+                'game_price': self.game_price,
+                'time': self.time}
+
     def __repr__(self):
         return "Game Id:" + str(self.game_id)
 
+    # def create_date():
+    #     game1 = Game("123", "2312", "123")
+    #     price1 = Price('11')
+    #     game1.game_price.append(price1)
+    #     db.session.add(game1)
+    #     db.session.commit()
 
-# def create_date():
-#     game1 = Game("123", "2312", "123")
-#     price1 = Price('11')
-#     game1.game_price.append(price1)
-#     db.session.add(game1)
-#     db.session.commit()
-
-
-# create_date()
-db.create_all()
+    # create_date()
+    db.create_all()
