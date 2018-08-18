@@ -1,5 +1,5 @@
 from flask import jsonify
-from flask_restful import Resource
+from flask_restful import Resource, reqparse
 
 import config
 import data_spider.model as model
@@ -8,7 +8,14 @@ db = config.Config.db
 
 
 class GameList(Resource):
-    def get(self, page=0, per_page=50):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('page', type=int, default=1)
+        parser.add_argument('per_page', type=int, default=50)
+        args = parser.parse_args()
+        page = args.page
+        per_page = args.per_page
+
         game = model.Game.query.with_entities(model.Game.id, model.Game.game_name, model.Game.game_number,
                                               model.Game.gama_link).paginate(page, per_page, error_out=False)
         game.items = convert_to_dict(game.items)
@@ -24,9 +31,13 @@ class GameList(Resource):
 
 class PriceList(Resource):
     def get(self):
-        return self.post(0, 50)
+        parser = reqparse.RequestParser()
+        parser.add_argument('page', type=int, default=1)
+        parser.add_argument('per_page', type=int, default=50)
+        args = parser.parse_args()
+        page = args.page
+        per_page = args.per_page
 
-    def post(self, page=0, per_page=50):
         prices = db.session.query(model.Price).with_entities(model.Price.id, model.Price.game_id,
                                                              model.Price.gama_price,
                                                              model.Price.time).distinct(
