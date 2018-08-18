@@ -23,22 +23,31 @@ class Game(db.Model):
                 'game_name': self.game_name,
                 'gama_link': self.gama_link}
 
+    def __repr__(self):
+        return {
+            "id": self.id,
+            "game_number": self.game_number,
+            "game_name": self.game_name,
+            "gama_link": self.gama_link
+        }
+
 
 class Price(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     game_id = db.Column(db.Integer, db.ForeignKey("game.id"))
     gama_price = db.Column(db.Float)
-    time = db.Column(db.TIMESTAMP, default=datetime.datetime.utcnow)
+    time = db.Column(db.TIMESTAMP, default=datetime.datetime.now())
 
     def __init__(self, price):
         self.gama_price = price
 
-    @property
-    def serialize(self):
-        return {'id': self.id,
-                'game_id': self.game_id,
-                'gama_price': self.gama_price,
-                'time': str(self.time)}
+    def __repr__(self):
+        return {
+            "id": self.id,
+            "game_id": self.game_id,
+            "gama_price": self.gama_price,
+            "time": self.time
+        }
 
 # def create_date():
 #     game1 = Game("123", "2312", "123")

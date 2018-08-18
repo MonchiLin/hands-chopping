@@ -14,8 +14,8 @@ def make_shell_context():
 
 
 api = Config.api
-api.add_resource(view.GameList, '/')
-api.add_resource(view.PriceList, '/price')
+api.add_resource(view.GameList, '/games/')
+api.add_resource(view.PriceList, '/prices/')
 
 if __name__ == '__main__':
     manager.run()

@@ -4,6 +4,7 @@ from enum import Enum, unique
 from flask import Flask
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 
 
 class App(object):
@@ -14,10 +15,11 @@ class App(object):
     def get_app(cls, *args, **kwargs):
         if not hasattr(App, "_app"):
             App._app = Flask(__name__)
-            # App._app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///app.db'
             App._app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///{}/data.db'.format(
                 os.path.dirname(os.path.realpath(__file__)))
             App._app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+            App._app.config['CORS_HEADERS'] = 'Content-Type'
+            CORS(App._app)
         return App._app
 
     @classmethod
