@@ -16,15 +16,23 @@ class GameList(Resource):
         page = args.page
         per_page = args.per_page
 
-        game = model.Game.query.with_entities(model.Game.id, model.Game.game_name, model.Game.game_number,
-                                              model.Game.gama_link).paginate(page, per_page, error_out=False)
-        game.items = convert_to_dict(game.items)
+        games = model.Game.query.with_entities(model.Game.id, model.Game.game_name, model.Game.game_number,
+                                               model.Game.game_link).paginate(page, per_page, error_out=False)
+
+        games.items = convert_to_dict(games.items)
+
+        for index, game in enumerate(games.items):
+            game_id = game['id']
+            data = db.session.query(model.Price).filter(model.Price.game_id == game_id).all()
+
+            game["game_price"] = data[-1].game_price
+
         data = {
-            'items': game.items,
-            'page': game.page,
-            'per_page': game.per_page,
-            'total': game.total,
-            'pasge': game.pages,
+            'items': games.items,
+            'page': games.page,
+            'per_page': games.per_page,
+            'total': games.total,
+            'pasge': games.pages,
         }
         return jsonify(data)
 
@@ -39,9 +47,9 @@ class PriceList(Resource):
         per_page = args.per_page
 
         prices = db.session.query(model.Price).with_entities(model.Price.id, model.Price.game_id,
-                                                             model.Price.gama_price,
+                                                             model.Price.game_price,
                                                              model.Price.time).distinct(
-            model.Price.gama_price).order_by(model.Price.gama_price).paginate(page, per_page, error_out=False)
+            model.Price.game_price).order_by(model.Price.game_price).paginate(page, per_page, error_out=False)
         prices.items = convert_to_dict(prices.items)
         data = {
             'items': prices.items,

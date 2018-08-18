@@ -6,11 +6,22 @@ import grequests
 from apscheduler.schedulers.blocking import BlockingScheduler
 from bs4 import BeautifulSoup
 from sqlalchemy import create_engine
-
+from pypinyin import pinyin, Style
 from config import Config
 from data_spider.model import Game, Price
 
 session = grequests.Session()
+
+
+def is_include_zh(s):
+    for c in s:
+        if not ('\u4e00' <= c <= '\u9fa5'):
+            return False
+    return True
+
+
+def clear_text(text):
+    return re.sub("[\s+\.\!\/_,$%^*(+\"\')]+|[+——()?【】“”！，。？、~@#￥%……&*（）]+'", '', text)
 
 
 def get_connection(config):
@@ -58,7 +69,17 @@ def fetch(db, soup, config, link):
         if existed is None:
             game_temp = Game(name, number, info['href'])
             price_temp = Price(price_number)
-            game_temp.gama_price.append(price_temp)
+            game_temp.game_price.append(price_temp)
+
+            if is_include_zh(name[:4]):
+                prue_name = clear_text(name)
+                p = pinyin(prue_name)
+
+                jianpin = pinyin(prue_name, style=Style.FIRST_LETTER)
+                quanpin = pinyin(prue_name, style=Style.NORMAL)
+                game_temp.game_jianpin = ''.join([j[0] for j in jianpin])
+                game_temp.game_quanpin = ''.join([j[0] for j in quanpin])
+
             db.session.add(game_temp)
             db.session.commit()
         else:

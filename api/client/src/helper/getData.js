@@ -8,10 +8,13 @@ const baseUrl = 'http://127.0.0.1:5000/'
  * @param per_page
  * @returns {AxiosPromise<any>}
  */
-export function getGames(page, per_page) {
+export function getGames(page = 1, per_page = 50) {
     const url = 'games'
-    return axios.post(baseUrl + url, {
-        params: {page, per_page}
+    return axios.get(baseUrl + url, {
+        params: {
+            page: page,
+            per_page: per_page
+        }
     })
 
 }

@@ -5,6 +5,8 @@ import VueRouter from 'vue-router'
 require('vuetify/src/stylus/app.styl')
 
 import GameList from './components/GameList'
+import Chopping from './components/Chopping'
+import Product from './components/Product'
 
 
 import {
@@ -17,11 +19,15 @@ import {
     VIcon,
     VGrid,
     VToolbar,
-    transitions
+    VDataTable,
+    transitions,
+    VProgressCircular,
+    VPagination,
 } from 'vuetify'
 
 Vue.use(Vuetify, {
     components: {
+        Vuetify,
         VApp,
         VNavigationDrawer,
         VFooter,
@@ -30,7 +36,10 @@ Vue.use(Vuetify, {
         VIcon,
         VGrid,
         VToolbar,
-        transitions
+        VDataTable,
+        transitions,
+        VProgressCircular,
+        VPagination,
     },
     theme: {
         primary: '#ee44aa',
@@ -49,7 +58,9 @@ Vue.use(VueRouter)
 Vue.config.productionTip = false
 
 const routers = [
-    {path: '/', name: 'games', component: GameList}
+    {path: '/', name: 'games', component: GameList},
+    {path: '/chopping', name: 'chopping', component: Chopping},
+    {path: '/product/:number', name: 'product', component: Product},
 ]
 
 const router = new VueRouter({
