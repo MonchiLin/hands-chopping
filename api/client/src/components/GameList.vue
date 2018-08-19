@@ -102,7 +102,6 @@
                     })
             },
             openStore(row) {
-                const playstation = 'https://store.playstation.com'
                 window.open(playstation + row.game_link)
             },
             changePage(page) {

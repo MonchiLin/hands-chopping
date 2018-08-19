@@ -1,5 +1,6 @@
 from flask import jsonify
 from flask_restful import Resource, reqparse
+from sqlalchemy import desc
 
 import config
 import data_spider.model as model
@@ -82,6 +83,26 @@ class Filter(Resource):
         results = db.session.execute(raw_sql).fetchall()
 
         return jsonify(raw_query_to_json(results))
+
+
+class Game(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('game_number', type=str, default=None)
+        args = parser.parse_args()
+        game_number = args.game_number
+
+        if game_number is None:
+            return
+
+        # result = model.Price.query.filter_by(game_id=game_number).order_by(desc(model.Price.time)).all()
+        game = model.Game.query.filter_by(game_number=game_number).first()
+        prices = model.Price.query.filter_by(game_id=game.id).order_by(desc(model.Price.time)).all()
+
+        return jsonify({
+            'game': game.serialize,
+            'prices': [p.serialize for p in prices]
+        })
 
 
 def convert_to_dict(results):

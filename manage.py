@@ -18,6 +18,7 @@ api = Config.api
 api.add_resource(view.GameList, '/games/')
 api.add_resource(view.PriceList, '/prices/')
 api.add_resource(view.Filter, '/filter/')
+api.add_resource(view.Game, '/game/')
 
 if __name__ == '__main__':
     manager.run()

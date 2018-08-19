@@ -1,5 +1,11 @@
-import {debounceTime, map, switchMap, distinctUntilChanged, filter, publishReplay, refCount} from 'rxjs/operators'
-import {Subject, merge, from,defer} from 'rxjs'
+import {
+	debounceTime,
+	distinctUntilChanged,
+	publishReplay,
+	refCount,
+	switchMap,
+} from 'rxjs/operators'
+import { defer, from, merge, Subject } from 'rxjs'
 
 export class FetchDataStore {
     // request 是一个请求刷新数据的 API 函数,
@@ -36,4 +42,40 @@ export class FetchDataStore {
             return data;
         });
     }
+}
+
+export function formatDate (time, fm) {
+	if (arguments.length === 0) {
+		return null
+	}
+	const format = fm || '{y}-{m}-{d} {h}:{i}:{s}'
+	let date
+	if (typeof time === 'object') {
+		date = time
+	} else {
+		if (('' + time).length === 10) {
+			time = parseInt(time) * 1000
+		}
+		date = new Date(time)
+	}
+	const formatObj = {
+		y: date.getFullYear(),
+		m: date.getMonth() + 1,
+		d: date.getDate(),
+		h: date.getHours(),
+		i: date.getMinutes(),
+		s: date.getSeconds(),
+		a: date.getDay(),
+	}
+	const time_str = format.replace(/{(y|m|d|h|i|s|a)+}/g, (result, key) => {
+		let value = formatObj[key]
+		if (key === 'a') {
+			return ['一', '二', '三', '四', '五', '六', '日'][value - 1]
+		}
+		if (result.length > 0 && value < 10) {
+			value = '0' + value
+		}
+		return value || 0
+	})
+	return time_str
 }

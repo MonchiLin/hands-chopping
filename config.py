@@ -40,6 +40,7 @@ class Config:
     port = 6379
     sqlite = 'sqlite:///{}/data.db'.format(os.path.dirname(os.path.realpath(__file__)))
     path = os.path.dirname(os.path.realpath(__file__))
+    img_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)),'img_dir')
     baseUrl = "https://store.playstation.com/"
     region = 'zh-hans-cn'
     app = App.get_app()
@@ -64,3 +65,4 @@ class Config:
 class Region(Enum):
     HK = 'zh-hant-hk'
     CHAIN = 'zh-hans-cn'
+

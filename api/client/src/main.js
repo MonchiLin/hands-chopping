@@ -1,30 +1,30 @@
 import Vue from 'vue'
 import App from './App.vue'
 import VueRouter from 'vue-router'
-
-require('vuetify/src/stylus/app.styl')
-
 import GameList from './components/GameList'
 import Chopping from './components/Chopping'
 import Product from './components/Product'
 
-
 import {
-    Vuetify,
-    VApp,
-    VNavigationDrawer,
-    VFooter,
-    VList,
-    VBtn,
-    VIcon,
-    VGrid,
-    VToolbar,
-    VDataTable,
-    transitions,
-    VProgressCircular,
-    VPagination,
-    VAutocomplete,
+	transitions,
+	VApp,
+	VAutocomplete,
+	VBtn,
+	VCard,
+	VDataTable,
+	VFooter,
+	VGrid,
+	VIcon,
+	VList,
+	VNavigationDrawer,
+	VPagination,
+	VProgressCircular,
+	VToolbar,
+	Vuetify,
 } from 'vuetify'
+import { formatDate } from './helper/helper'
+
+require('vuetify/src/stylus/app.styl')
 
 Vue.use(Vuetify, {
     components: {
@@ -36,6 +36,7 @@ Vue.use(Vuetify, {
         VBtn,
         VIcon,
         VGrid,
+		VCard,
         VToolbar,
         VDataTable,
         transitions,
@@ -55,9 +56,11 @@ Vue.use(Vuetify, {
 })
 
 Vue.use(VueRouter)
+Vue.filter('date', formatDate)
 
 Vue.config.productionTip = false
 window.baseUrl = 'http://127.0.0.1:5000/'
+window.playstation = 'https://store.playstation.com'
 
 const routers = [
     {path: '/', name: 'games', component: GameList},

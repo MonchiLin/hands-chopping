@@ -31,6 +31,8 @@ def get_connection(config):
 
 def get_data(link, config):
     db = config.db
+    pool = gevent.pool.Pool(20)
+    threads = []
 
     result = session.get(config.baseUrl + link["link"], headers=config.headers)
     soup = BeautifulSoup(result.text, "html5lib")
@@ -45,7 +47,10 @@ def get_data(link, config):
             url = config.baseUrl + link["link"] + '/' + str(i)
             res = session.get(url, headers=config.headers)
             content = BeautifulSoup(res.text, "html5lib")
-            fetch(db, content, config, link)
+            threads.append(pool.spawn(fetch, db, content, config, link))
+
+        gevent.joinall(threads)
+
 
 
 def fetch(db, soup, config, link):
@@ -63,17 +68,23 @@ def fetch(db, soup, config, link):
 
         name = info.find("div").text.strip()
         number = re.split("/", info.attrs["href"])[-1]
-        existed = Game.query.filter_by(game_number=number).first()
+        href = info['href']
 
+        detail_request = session.get(config.baseUrl + href, headers=config.headers)
+        detail_soup = BeautifulSoup(detail_request.text, "html5lib")
+
+        # print(detail_soup.text.strip()[:15])
+
+        picture = detail_soup.select_one('div.product-image__img--main img').attrs["src"]
+        detail = detail_soup.select_one('div.pdp__description').text
+        existed = Game.query.filter_by(game_number=number).first()
         if existed is None:
-            game_temp = Game(name, number, info['href'])
+            game_temp = Game(name, number, href, picture, detail)
             price_temp = Price(price_number)
             game_temp.game_price.append(price_temp)
 
             if is_include_zh(name[:4]):
                 prue_name = clear_text(name)
-                p = pinyin(prue_name)
-
                 jianpin = pinyin(prue_name, style=Style.FIRST_LETTER)
                 quanpin = pinyin(prue_name, style=Style.NORMAL)
                 game_temp.game_jianpin = ''.join([j[0] for j in jianpin])
