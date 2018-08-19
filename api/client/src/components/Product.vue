@@ -3,15 +3,14 @@
         <v-flex xs12 sm6 offset-sm3>
             <v-card>
                 <v-card-media
-                        src="https://cdn.vuetifyjs.com/images/cards/desert.jpg"
-                        height="200px">
+                        :src="game.game_picture"
+                        height="480px">
                 </v-card-media>
 
                 <v-card-title primary-title>
                     <div>
                         <h3 class="headline mb-0">{{game.game_name}}</h3>
-                        <div>Located two hours south of Sydney in the <br>Southern Highlands of New South Wales, ...
-                        </div>
+                        <div v-html="game.game_detail"></div>
                     </div>
                 </v-card-title>
                 <v-list two-line v-for="price of prices">

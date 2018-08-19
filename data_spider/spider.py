@@ -76,10 +76,10 @@ def fetch(db, soup, config, link):
         # print(detail_soup.text.strip()[:15])
 
         picture = detail_soup.select_one('div.product-image__img--main img').attrs["src"]
-        detail = detail_soup.select_one('div.pdp__description').text
+        detail = detail_soup.select_one('div.pdp__description')
         existed = Game.query.filter_by(game_number=number).first()
         if existed is None:
-            game_temp = Game(name, number, href, picture, detail)
+            game_temp = Game(name, number, href, picture, str(detail))
             price_temp = Price(price_number)
             game_temp.game_price.append(price_temp)
 

@@ -17,10 +17,13 @@ class GameList(Resource):
         page = page or args.page
         per_page = per_page or args.per_page
 
-        games = model.Game.query.with_entities(model.Game.id, model.Game.game_name, model.Game.game_number,
-                                               model.Game.game_link).paginate(page, per_page, error_out=False)
+        # games = model.Game.query.with_entities(model.Game.id, model.Game.game_name, model.Game.game_number,
+        #                                        model.Game.game_link).paginate(page, per_page, error_out=False)
+        games = model.Game.query.paginate(page, per_page, error_out=False)
 
-        games.items = convert_to_dict(games.items)
+
+        # games.items = convert_to_dict(games.items)
+        games.items = [game.serialize for game in games.items]
 
         for index, game in enumerate(games.items):
             game_id = game['id']

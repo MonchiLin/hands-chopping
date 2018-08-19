@@ -30,7 +30,6 @@ class Game(db.Model):
             'id': self.id,
             'game_number': self.game_number,
             'game_name': self.game_name,
-            'game_price': self.game_price,
             'game_link': self.game_link,
             'game_tag': self.game_tag,
             'game_Genre': self.game_Genre,
