@@ -1,12 +1,11 @@
-import os
 import re
 
 import gevent
 import grequests
-from apscheduler.schedulers.blocking import BlockingScheduler
 from bs4 import BeautifulSoup
-from sqlalchemy import create_engine
 from pypinyin import pinyin, Style
+from sqlalchemy import create_engine
+
 from config import Config
 from data_spider.model import Game, Price
 

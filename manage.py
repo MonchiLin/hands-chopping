@@ -1,7 +1,8 @@
+from flask_script import Manager, Shell
+
 import api.view  as view
-from config import Config
 from app import create_app
-from flask_script import Manager, Shell, Server
+from config import Config
 
 app = create_app()
 app.debug = True

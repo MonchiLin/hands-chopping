@@ -1,4 +1,3 @@
-from api import view
 from config import Config
 
 

@@ -56,4 +56,5 @@ class Price(db.Model):
     #     db.session.commit()
 
     # create_date()
-    db.create_all()
+
+db.create_all()
