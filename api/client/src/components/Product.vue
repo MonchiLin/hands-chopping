@@ -6,13 +6,17 @@
                         :src="game.game_picture"
                         height="480px">
                 </v-card-media>
-
                 <v-card-title primary-title>
-                    <div>
-                        <h3 class="headline mb-0">{{game.game_name}}</h3>
-                        <div v-html="game.game_detail"></div>
-                    </div>
+                    <h3 class="headline mb-0">{{game.game_name}}</h3>
+                    <v-expansion-panel>
+                        <v-expansion-panel-content>
+                            <div slot="header">详细信息</div>
+                            <div v-html="game.game_detail"></div>
+
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
                 </v-card-title>
+                <v-divider></v-divider>
                 <v-list two-line v-for="price of prices">
                     <v-list-tile @click="">
                         <v-list-tile-action>
@@ -25,6 +29,7 @@
                         </v-list-tile-content>
                     </v-list-tile>
                 </v-list>
+                <v-divider></v-divider>
                 <v-card-actions>
                     <v-btn flat color="orange">Link
                         <v-icon right dark>cloud_upload</v-icon>
